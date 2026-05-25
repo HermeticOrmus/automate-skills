@@ -1,0 +1,50 @@
+---
+description: Automation-design protocol. Scope the task, pick the simplest tool, implement the smallest version, add error handling and idempotency, dry-run then schedule. Apply when turning a repetitive task into a script.
+alwaysApply: false
+---
+
+# Automate
+
+A protocol for turning a repetitive task into a reliable automation script. Apply when the work is "automate this", "write a script for", or scheduling an unattended job.
+
+**Tradeoff**: bias toward scoping and hardening over speed. For a one-off you will run once and watch, use judgment.
+
+## 1. Scope the task before writing code
+
+- What is the task, in one sentence? (Two sentences means two tasks; split them.)
+- How often, and what triggers it (manual, schedule, file change, event)?
+- Inputs (files, args, env, network) and outputs (files, logs, exit code, side effects)?
+- Edge cases (empty input, partial input, already-done state, missing dependency, no network)?
+- Cost of running it twice? Of failing halfway?
+
+## 2. Pick the simplest tool that fits
+
+- Bash: file moves, system commands, glue between existing CLI tools.
+- Python: branching logic, structured data, API calls, hard quoting.
+- Makefile: multi-step task graphs with dependencies.
+- A scheduler (systemd timer or cron) wraps one of the above for unattended runs.
+
+If the task is three shell commands, it is a script, not a program.
+
+## 3. Implement the smallest version that works
+
+Write the path that handles the real inputs first. No speculative flags, no config for a single caller. Bash scripts start with `set -euo pipefail`: exit on error, on undefined variable, on any failed pipeline stage.
+
+## 4. Add error handling and idempotency
+
+- Validate inputs before acting.
+- Make it idempotent: a second run on the same state is a no-op, not a duplicate or corruption.
+- Fail loud. Never swallow an error to keep a green exit code.
+- Log what it did and when.
+- Guard destructive steps (confirm when interactive, `--force`/`--yes` flag when not).
+
+## 5. Dry-run, then make it runnable on a schedule
+
+- Add a `--dry-run` that prints actions and changes nothing; run it first on real inputs.
+- Test the edge cases from step 1 deliberately.
+- Schedule the verified script; capture output to a log, alert on non-zero exit.
+- Pin absolute paths and explicit `PATH`, because a schedule runs with a minimal environment, not your interactive shell.
+
+---
+
+Pair with [`shell-safety-skills`](https://github.com/HermeticOrmus/shell-safety-skills) for safe construction of the shell scripts this protocol produces.
