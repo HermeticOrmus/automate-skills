@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://ormus.solutions/mascot/pixellab_liquid_to_mercury.gif" alt="Automate Skills" width="128" style="image-rendering: pixelated;" />
+  <img src="https://ormus.solutions/mascot/pixellab_liquid_to_ouroboros.gif" alt="Automate Skills" width="128" style="image-rendering: pixelated;" />
 </p>
 
 <h1 align="center">Automate Skills</h1>
